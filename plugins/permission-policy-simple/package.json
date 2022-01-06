@@ -20,12 +20,12 @@
     "clean": "backstage-cli clean"
   },
   "dependencies": {
-    "@backstage/catalog-model": "^0.9.4",
-    "@backstage/plugin-auth-backend": "^0.6.0",
-    "@backstage/plugin-catalog-backend": "^0.20.0",
-    "@backstage/plugin-catalog-common": "^0.1.0",
-    "@backstage/plugin-permission-common": "^0.3.0",
-    "@backstage/plugin-permission-node": "^0.3.0"
+    "@backstage/catalog-model": "^0.9.10-next.0",
+    "@backstage/plugin-auth-backend": "^0.7.0-next.0",
+    "@backstage/plugin-catalog-backend": "^0.21.0-next.0",
+    "@backstage/plugin-catalog-common": "^0.1.1-next.0",
+    "@backstage/plugin-permission-common": "^0.4.0-next.0",
+    "@backstage/plugin-permission-node": "^0.4.0-next.0"
   },
   "devDependencies": {
     "@backstage/cli": "^0.11.0",
