@@ -24,6 +24,7 @@ export {
   EntitySplunkOnCallCard,
   splunkOnCallPlugin,
   splunkOnCallPlugin as plugin,
+  SplunkOnCallIncidentsPage,
   SplunkOnCallPage,
 } from './plugin';
 export { isSplunkOnCallAvailable } from './components/EntitySplunkOnCallCard';

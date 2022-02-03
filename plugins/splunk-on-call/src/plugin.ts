@@ -50,6 +50,17 @@ export const SplunkOnCallPage = splunkOnCallPlugin.provide(
   }),
 );
 
+export const SplunkOnCallIncidentsPage = splunkOnCallPlugin.provide(
+  createRoutableExtension({
+    name: 'SplunkOnCallIncidentsPage',
+    component: () =>
+      import('./components/SplunkOnCallIncidentsPage').then(
+        m => m.SplunkOnCallIncidentsPage,
+      ),
+    mountPoint: rootRouteRef,
+  }),
+);
+
 export const EntitySplunkOnCallCard = splunkOnCallPlugin.provide(
   createComponentExtension({
     name: 'EntitySplunkOnCallCard',

@@ -15,12 +15,12 @@
  */
 import React from 'react';
 import { createDevApp } from '@backstage/dev-utils';
-import { splunkOnCallPlugin, SplunkOnCallPage } from '../src/plugin';
+import { splunkOnCallPlugin, SplunkOnCallIncidentsPage } from '../src/plugin';
 
 createDevApp()
   .registerPlugin(splunkOnCallPlugin)
   .addPage({
     title: 'Splunk On-Call',
-    element: <SplunkOnCallPage />,
+    element: <SplunkOnCallIncidentsPage />,
   })
   .render();
