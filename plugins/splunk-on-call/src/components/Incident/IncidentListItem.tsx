@@ -67,7 +67,7 @@ type Props = {
   readOnly: boolean;
 };
 
-const IncidentPhaseStatus = ({
+export const IncidentPhaseStatus = ({
   currentPhase,
 }: {
   currentPhase: IncidentPhase;
@@ -82,7 +82,7 @@ const IncidentPhaseStatus = ({
   }
 };
 
-const incidentPhaseTooltip = (currentPhase: IncidentPhase) => {
+export const incidentPhaseTooltip = (currentPhase: IncidentPhase) => {
   switch (currentPhase) {
     case 'UNACKED':
       return 'Triggered';

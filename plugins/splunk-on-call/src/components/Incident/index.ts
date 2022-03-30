@@ -15,3 +15,5 @@
  */
 
 export { Incidents } from './Incidents';
+export { IncidentPhaseStatus, incidentPhaseTooltip } from './IncidentListItem';
+export { IncidentsTable } from './IncidentsTable';
