@@ -62,17 +62,15 @@ const renderTransitions = (incident: any): React.ReactNode => {
 
 const renderEntityState = (incident: any): React.ReactNode => {
   return (
-    <>
-      <Tooltip
-        title={incidentPhaseTooltip(incident.currentPhase)}
-        placement="top"
-      >
-        <div>
-          <IncidentPhaseStatus currentPhase={incident.currentPhase} />
-          {incident.entityState}
-        </div>
-      </Tooltip>
-    </>
+    <Tooltip
+      title={incidentPhaseTooltip(incident.currentPhase)}
+      placement="top"
+    >
+      <div>
+        <IncidentPhaseStatus currentPhase={incident.currentPhase} />
+        {incident.entityState}
+      </div>
+    </Tooltip>
   );
 };
 
