@@ -42,7 +42,7 @@ const renderTransitions = (incident: any): React.ReactNode => {
   return (
     <List dense>
       {incident.transitions!.map((transition, index) => (
-        <ListItem dense key={incident.entityId}>
+        <ListItem dense key={index}>
           <ListItemIcon>
             <Tooltip
               title={incidentPhaseTooltip(transition.name)}
