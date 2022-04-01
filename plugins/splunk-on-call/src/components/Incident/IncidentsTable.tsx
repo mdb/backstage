@@ -17,7 +17,14 @@ import React from 'react';
 import Incident from '../../types';
 import { IncidentPhaseStatus, incidentPhaseTooltip } from './IncidentListItem';
 import { Link, Table, TableColumn } from '@backstage/core-components';
-import { Tooltip } from '@material-ui/core';
+import {
+  Tooltip,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+} from '@material-ui/core';
 
 const renderDisplayName = (incident: any): React.ReactNode => {
   return (
@@ -27,16 +34,29 @@ const renderDisplayName = (incident: any): React.ReactNode => {
   );
 };
 
+const transitionText = (transition: any): string => {
+  return `${transition.name} at ${transition.at} by ${transition.by}`;
+};
+
 const renderTransitions = (incident: any): React.ReactNode => {
   return (
-    <ul>
+    <List dense>
       {incident.transitions!.map((transition, index) => (
-        <li key={index}>
-          <IncidentPhaseStatus currentPhase={transition.name} />
-          {transition.name} at {transition.at} by {transition.by}
-        </li>
+        <ListItem dense key={incident.entityId}>
+          <ListItemIcon>
+            <Tooltip
+              title={incidentPhaseTooltip(transition.name)}
+              placement="top"
+            >
+              <div>
+                <IncidentPhaseStatus currentPhase={transition.name} />
+              </div>
+            </Tooltip>
+          </ListItemIcon>
+          <ListItemText primary={transitionText(transition)} />
+        </ListItem>
       ))}
-    </ul>
+    </List>
   );
 };
 
