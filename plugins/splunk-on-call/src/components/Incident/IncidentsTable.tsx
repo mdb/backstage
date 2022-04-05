@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import React from 'react';
-import Incident from '../../types';
+import { Incident } from '../types';
 import { IncidentPhaseStatus, incidentPhaseTooltip } from './IncidentListItem';
 import { Link, Table, TableColumn } from '@backstage/core-components';
 import {
@@ -22,28 +22,45 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemSecondaryAction,
   ListItemText,
+  makeStyles,
+  Typography,
 } from '@material-ui/core';
+import { DateTime, Duration } from 'luxon';
 
-const renderDisplayName = (incident: any): React.ReactNode => {
+const relativeTime = (time: string): string | null => {
+  const duration = new Date().getTime() - new Date(time!).getTime();
+
+  return DateTime.local()
+    .minus(Duration.fromMillis(duration))
+    .toRelative({ locale: 'en' });
+};
+
+const displayName = (incident: any): React.ReactNode => {
   return (
-    <Link to={incident.incidentLink} target="_blank" rel="noreferrer">
-      {incident.entityDisplayName}
-    </Link>
+    <>
+      <Link to={incident.incidentLink} target="_blank" rel="noreferrer">
+        {incident.entityDisplayName}
+      </Link>
+      <Typography noWrap variant="body2" color="textSecondary">
+        Created {relativeTime(incident.startTime)}
+      </Typography>
+    </>
   );
 };
 
 const transitionText = (transition: any): string => {
-  return `${transition.name} at ${transition.at} by ${transition.by}`;
+  return `${transition.name} at ${relativeTime(transition.at)} by ${
+    transition.by
+  }`;
 };
 
-const renderTransitions = (incident: any): React.ReactNode => {
+const transitions = (incident: any, classes: any): React.ReactNode => {
   return (
     <List dense>
-      {incident.transitions!.map((transition, index) => (
+      {incident.transitions!.map((transition: any, index: number) => (
         <ListItem dense key={index}>
-          <ListItemIcon>
+          <ListItemIcon className={classes.listItemIcon}>
             <Tooltip
               title={incidentPhaseTooltip(transition.name)}
               placement="top"
@@ -60,7 +77,7 @@ const renderTransitions = (incident: any): React.ReactNode => {
   );
 };
 
-const renderEntityState = (incident: any): React.ReactNode => {
+const entityState = (incident: any): React.ReactNode => {
   return (
     <Tooltip
       title={incidentPhaseTooltip(incident.currentPhase)}
@@ -75,33 +92,47 @@ const renderEntityState = (incident: any): React.ReactNode => {
 };
 
 export const IncidentsTable = ({ incidents }: { incidents: Incident[] }) => {
+  const useStyles = makeStyles({
+    listItemIcon: {
+      minWidth: '1em',
+    },
+  });
+  const classes = useStyles();
   const columns: TableColumn[] = [
     { title: 'Incident number', field: 'incidentNumber' },
     {
       title: 'State',
       field: 'entityState',
-      render: incident => renderEntityState(incident),
+      render: incident => entityState(incident),
     },
     {
       title: 'Display name',
       field: 'entityDisplayName',
-      render: incident => renderDisplayName(incident),
+      render: incident => displayName(incident),
     },
     { title: 'Start', field: 'startTime' },
     {
       title: 'Transitions',
       field: 'transitions',
-      render: incident => renderTransitions(incident),
+      render: incident => transitions(incident, classes),
     },
     {
       title: 'Paged Teams',
       field: 'pagedTeams',
-      render: incident => incident.pagedTeams.join(', '),
+      render: incident => {
+        const inc = incident as Incident;
+
+        return inc.pagedTeams?.join(', ');
+      },
     },
     {
       title: 'Paged Users',
       field: 'pagedUsers',
-      render: incident => incident.pagedUsers.join(', '),
+      render: incident => {
+        const inc = incident as Incident;
+
+        return inc.pagedUsers?.join(', ');
+      },
     },
   ];
 
@@ -116,7 +147,9 @@ export const IncidentsTable = ({ incidents }: { incidents: Incident[] }) => {
       title="Splunk On-Call Incidents"
       columns={columns}
       data={incidents.sort(
-        (x, y) => new Date(y.startTime) - new Date(x.startTime),
+        (x, y) =>
+          new Date(y.startTime || 0).getTime() -
+          new Date(x.startTime || 0).getTime(),
       )}
     />
   );

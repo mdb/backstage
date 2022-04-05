@@ -18,12 +18,11 @@ import React from 'react';
 import useAsync from 'react-use/lib/useAsync';
 import { Alert } from '@material-ui/lab';
 import { splunkOnCallApiRef } from '../api';
-import { configApiRef, useApi } from '@backstage/core-plugin-api';
+import { useApi } from '@backstage/core-plugin-api';
 import { IncidentsTable } from './Incident';
 import { Progress } from '@backstage/core-components';
 
 export const SplunkOnCallIncidents = () => {
-  const config = useApi(configApiRef);
   const api = useApi(splunkOnCallApiRef);
   const { value, loading, error } = useAsync(async () => {
     const incidents = await api.getIncidents();
@@ -43,9 +42,9 @@ export const SplunkOnCallIncidents = () => {
     );
   }
 
-  return (
-    <div>
-      <IncidentsTable incidents={value} />
-    </div>
-  );
+  if (!value) {
+    return null;
+  }
+
+  return <IncidentsTable incidents={value} />;
 };
