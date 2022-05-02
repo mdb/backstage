@@ -75,6 +75,13 @@ export interface SplunkOnCallApi {
    * Get a list of escalation policies for your organization.
    */
   getEscalationPolicies(): Promise<EscalationPolicyInfo[]>;
+
+  /**
+   * Get incident history for your organization, searching over date ranges with filtering options.
+   */
+  getIncidentsReporting(
+    params: IncidentsReportingParams,
+  ): Promise<IncidentsReportingResponse>;
 }
 
 export type EscalationPolicyResponse = {
@@ -97,6 +104,24 @@ export type IncidentsResponse = {
 
 export type OnCallsResponse = {
   teamsOnCall: OnCall[];
+};
+
+export type IncidentsReportingParams = {
+  // example: 2018-01-04T02:09:26Z
+  startedAfter?: string;
+  // example: 2018-01-04T02:09:26Z
+  startedBefore?: string;
+  service?: string;
+  routingKey?: string;
+  limit?: number;
+  offset?: number;
+};
+
+export type IncidentsReportingResponse = {
+  offset: number;
+  limit: number;
+  total: number;
+  incidents: Incident[];
 };
 
 export type ClientApiConfig = {

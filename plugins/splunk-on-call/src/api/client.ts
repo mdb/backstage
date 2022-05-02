@@ -32,6 +32,8 @@ import {
   ListUserResponse,
   EscalationPolicyResponse,
   ListRoutingKeyResponse,
+  IncidentsReportingParams,
+  IncidentsReportingResponse,
 } from './types';
 import {
   createApiRef,
@@ -109,6 +111,32 @@ export class SplunkOnCallClient implements SplunkOnCallApi {
     const { policies } = await this.getByUrl<EscalationPolicyResponse>(url);
 
     return policies;
+  }
+
+  async getIncidentsReporting(
+    params: IncidentsReportingParams,
+  ): Promise<IncidentsReportingResponse> {
+    const baseUrl = `${await this.config.discoveryApi.getBaseUrl(
+      'proxy',
+    )}/splunk-on-call-reporting/v2/incidents`;
+    const query = Object.keys(params as Record<string, string>)
+      .filter(key => {
+        const value = params[key as keyof IncidentsReportingParams] as string;
+
+        // filter out undefined and '' values
+        return value !== undefined && value !== '';
+      })
+      .map(key => {
+        return `${encodeURIComponent(key)}=${encodeURIComponent(
+          params[key as keyof IncidentsReportingParams] as string,
+        )}`;
+      })
+      .join('&');
+    const reporting = await this.getByUrl<IncidentsReportingResponse>(
+      `${baseUrl}?${query}`,
+    );
+
+    return reporting;
   }
 
   async incidentAction({
