@@ -102,14 +102,24 @@ export const Analysis = ({ team }: { team: Team | undefined }) => {
           return incident?.pagedTeams?.includes(team?.slug);
         })
       : value;
-    const groupings = groupByDay(teamIncidents);
-    const rawTrends = Object.keys(groupings).map(key => {
-      return groupings[key].length;
+    const teamGroupings = groupByDay(teamIncidents);
+    const teamRawTrends = Object.keys(teamGroupings).map(key => {
+      return teamGroupings[key].length;
     });
-    const ceiling = Math.max.apply(null, rawTrends);
-    const trends = rawTrends.map(trend => {
-      return trend / ceiling;
+    const teamCeiling = Math.max.apply(null, teamRawTrends);
+    const teamTrends = teamRawTrends.map(trend => {
+      return trend / teamCeiling;
     });
+
+    const orgGroupings = groupByDay(value);
+    const orgRawTrends = Object.keys(orgGroupings).map(key => {
+      return orgGroupings[key].length;
+    });
+    const orgCeiling = Math.max.apply(null, orgRawTrends);
+    const orgTrends = orgRawTrends.map(trend => {
+      return trend / orgCeiling;
+    });
+
     const headingPrefix = team ? team.name : 'Your organization';
 
     return (
@@ -118,7 +128,14 @@ export const Analysis = ({ team }: { team: Team | undefined }) => {
         {date.toUTCString()} and now
         <TrendLine
           color="blue"
-          data={trends}
+          data={teamTrends}
+          title="Incidents over the last week"
+        />
+        Your organization resolved {teamIncidents.length} incidents between{' '}
+        {date.toUTCString()} and now
+        <TrendLine
+          color="blue"
+          data={orgTrends}
           title="Incidents over the last week"
         />
       </>
