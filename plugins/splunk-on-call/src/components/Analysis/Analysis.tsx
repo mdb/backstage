@@ -20,7 +20,7 @@ import { useApi } from '@backstage/core-plugin-api';
 import { Alert } from '@material-ui/lab';
 import { Progress, TrendLine } from '@backstage/core-components';
 import { splunkOnCallApiRef } from '../../api';
-import { Incident } from '../types';
+import { Incident, Team } from '../types';
 
 const groupByDay = (incidents: Incident[]) => {
   const groupings: Record<string, Incident[]> = {};
@@ -40,12 +40,11 @@ const groupByDay = (incidents: Incident[]) => {
   return groupings;
 };
 
-export const Analysis = () => {
+export const Analysis = ({ team }: { team: Team | undefined }) => {
   const api = useApi(splunkOnCallApiRef);
-
+  const date = new Date();
+  date.setDate(date.getDate() - 7);
   const { value, loading, error } = useAsync(async () => {
-    const date = new Date();
-    date.setDate(date.getDate() - 7);
     const limit = 100;
 
     const getReportingPage = async (offset: number) => {
@@ -94,7 +93,16 @@ export const Analysis = () => {
   }
 
   if (value) {
-    const groupings = groupByDay(value);
+    const teamIncidents = team
+      ? value.filter(incident => {
+          if (!team?.slug) {
+            return false;
+          }
+
+          return incident?.pagedTeams?.includes(team?.slug);
+        })
+      : value;
+    const groupings = groupByDay(teamIncidents);
     const rawTrends = Object.keys(groupings).map(key => {
       return groupings[key].length;
     });
@@ -102,9 +110,12 @@ export const Analysis = () => {
     const trends = rawTrends.map(trend => {
       return trend / ceiling;
     });
+    const headingPrefix = team ? team.name : 'Your organization';
 
     return (
       <>
+        {headingPrefix} resolved {teamIncidents.length} incidents between{' '}
+        {date.toUTCString()} and now
         <TrendLine
           color="blue"
           data={trends}
