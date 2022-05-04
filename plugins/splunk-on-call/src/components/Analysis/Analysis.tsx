@@ -18,9 +18,27 @@ import React from 'react';
 import useAsync from 'react-use/lib/useAsync';
 import { useApi } from '@backstage/core-plugin-api';
 import { Alert } from '@material-ui/lab';
-import { Progress } from '@backstage/core-components';
+import { Progress, TrendLine } from '@backstage/core-components';
 import { splunkOnCallApiRef } from '../../api';
 import { Incident } from '../types';
+
+const groupByDay = (incidents: Incident[]) => {
+  const groupings: Record<string, Incident[]> = {};
+
+  incidents.reduce((r, a) => {
+    const startTime = new Date(a.startTime || '');
+    const date = startTime.getDate();
+    const year = startTime.getFullYear();
+    const month = startTime.getMonth();
+    const formattedDate = `${year}-${month}-${date}`;
+
+    groupings[formattedDate] = [...(groupings[formattedDate] || []), a];
+
+    return r;
+  });
+
+  return groupings;
+};
 
 export const Analysis = () => {
   const api = useApi(splunkOnCallApiRef);
@@ -75,5 +93,26 @@ export const Analysis = () => {
     );
   }
 
-  return <>{JSON.stringify(value)}</>;
+  if (value) {
+    const groupings = groupByDay(value);
+    const rawTrends = Object.keys(groupings).map(key => {
+      return groupings[key].length;
+    });
+    const ceiling = Math.max.apply(null, rawTrends);
+    const trends = rawTrends.map(trend => {
+      return trend / ceiling;
+    });
+
+    return (
+      <>
+        <TrendLine
+          color="blue"
+          data={trends}
+          title="Incidents over the last week"
+        />
+      </>
+    );
+  }
+
+  return null;
 };
