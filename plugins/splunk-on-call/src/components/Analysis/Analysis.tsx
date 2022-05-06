@@ -18,7 +18,7 @@ import React from 'react';
 import useAsync from 'react-use/lib/useAsync';
 import { useApi } from '@backstage/core-plugin-api';
 import { Alert } from '@material-ui/lab';
-import { Progress, TrendLine } from '@backstage/core-components';
+import { Gauge, Progress, TrendLine } from '@backstage/core-components';
 import { splunkOnCallApiRef } from '../../api';
 import { Incident, Team } from '../types';
 
@@ -43,7 +43,7 @@ const groupByDay = (incidents: Incident[]) => {
 export const Analysis = ({ team }: { team: Team | undefined }) => {
   const api = useApi(splunkOnCallApiRef);
   const date = new Date();
-  date.setDate(date.getDate() - 7);
+  date.setDate(date.getDate() - 6);
   const { value, loading, error } = useAsync(async () => {
     const limit = 100;
 
@@ -61,6 +61,7 @@ export const Analysis = ({ team }: { team: Team | undefined }) => {
       let offset = 0;
 
       while (morePages) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
         const response = await getReportingPage(offset);
         await incidents.push.apply(incidents, response.incidents);
 
@@ -131,12 +132,18 @@ export const Analysis = ({ team }: { team: Team | undefined }) => {
           data={teamTrends}
           title="Incidents over the last week"
         />
-        Your organization resolved {teamIncidents.length} incidents between{' '}
+        Your organization resolved {value.length} incidents between{' '}
         {date.toUTCString()} and now
         <TrendLine
           color="blue"
           data={orgTrends}
           title="Incidents over the last week"
+        />
+        <Gauge
+          getColor={() => 'blue'}
+          fractional={false}
+          unit=""
+          value={(100 * teamIncidents.length) / value.length}
         />
       </>
     );
