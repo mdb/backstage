@@ -32,9 +32,11 @@ import { splunkOnCallApiRef, UnauthorizedError } from '../api';
 import { MissingApiKeyOrApiIdError } from './Errors/MissingApiKeyOrApiIdError';
 import { EscalationPolicy } from './Escalation';
 import { Incidents } from './Incident';
+import { Analysis } from './Analysis';
 import { TriggerDialog } from './TriggerDialog';
 import { Team, User } from './types';
 import { configApiRef, useApi } from '@backstage/core-plugin-api';
+import { CardTab, TabbedCard } from '@backstage/core-components';
 
 import {
   EmptyState,
@@ -261,24 +263,46 @@ export const EntitySplunkOnCallCard = (props: EntitySplunkOnCallCardProps) => {
   return (
     <>
       {teams.map((team, i) => (
-        <Card key={i} className={classes.onCallCard}>
-          <CardHeader
-            title="Splunk On-Call"
-            subheader={[
-              <Typography key="team_name">
-                Team: {team && team.name ? team.name : ''}
-              </Typography>,
-              <HeaderIconLinkRow
-                key="incident_trigger"
-                links={!readOnly ? [serviceLink, triggerLink] : [serviceLink]}
-              />,
-            ]}
-          />
-          <Divider />
-          <CardContent>
-            <Content team={team} usersHashMap={usersAndTeams?.usersHashMap} />
-          </CardContent>
-        </Card>
+        <TabbedCard key={i} title="Splunk On-Call">
+          <CardTab label="Incidents">
+            <Card className={classes.onCallCard}>
+              <CardHeader
+                subheader={[
+                  <Typography>
+                    Team: {team && team.name ? team.name : ''}
+                  </Typography>,
+                  <HeaderIconLinkRow
+                    key="incident_trigger"
+                    links={
+                      !readOnly ? [serviceLink, triggerLink] : [serviceLink]
+                    }
+                  />,
+                ]}
+              />
+              <Divider />
+              <CardContent>
+                <Content
+                  team={team}
+                  usersHashMap={usersAndTeams?.usersHashMap}
+                />
+              </CardContent>
+            </Card>
+          </CardTab>
+          <CardTab label="Analysis">
+            <Card className={classes.onCallCard}>
+              <CardHeader
+                title="Incidents over the last 7 days"
+                subheader={[
+                  <Typography>
+                    Team: {team && team.name ? team.name : ''}
+                  </Typography>,
+                ]}
+              />
+              <Divider />
+              <Analysis team={team} />
+            </Card>
+          </CardTab>
+        </TabbedCard>
       ))}
     </>
   );
