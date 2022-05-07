@@ -21,7 +21,6 @@ import {
   Card,
   CardContent,
   CardHeader,
-  Divider,
   makeStyles,
   Typography,
 } from '@material-ui/core';
@@ -263,46 +262,28 @@ export const EntitySplunkOnCallCard = (props: EntitySplunkOnCallCardProps) => {
   return (
     <>
       {teams.map((team, i) => (
-        <TabbedCard key={i} title="Splunk On-Call">
-          <CardTab label="Incidents">
-            <Card className={classes.onCallCard}>
-              <CardHeader
-                subheader={[
-                  <Typography>
-                    Team: {team && team.name ? team.name : ''}
-                  </Typography>,
-                  <HeaderIconLinkRow
-                    key="incident_trigger"
-                    links={
-                      !readOnly ? [serviceLink, triggerLink] : [serviceLink]
-                    }
-                  />,
-                ]}
-              />
-              <Divider />
-              <CardContent>
-                <Content
-                  team={team}
-                  usersHashMap={usersAndTeams?.usersHashMap}
-                />
-              </CardContent>
-            </Card>
-          </CardTab>
-          <CardTab label="Analysis">
-            <Card className={classes.onCallCard}>
-              <CardHeader
-                title="Incidents over the last 7 days"
-                subheader={[
-                  <Typography>
-                    Team: {team && team.name ? team.name : ''}
-                  </Typography>,
-                ]}
-              />
-              <Divider />
+        <Card key={i} className={classes.onCallCard}>
+          <CardHeader
+            title="Splunk On-Call"
+            subheader={[
+              <Typography>
+                Team: {team && team.name ? team.name : ''}
+              </Typography>,
+              <HeaderIconLinkRow
+                key="incident_trigger"
+                links={!readOnly ? [serviceLink, triggerLink] : [serviceLink]}
+              />,
+            ]}
+          />
+          <TabbedCard>
+            <CardTab label="Incidents">
+              <Content team={team} usersHashMap={usersAndTeams?.usersHashMap} />
+            </CardTab>
+            <CardTab label="Analysis">
               <Analysis team={team} />
-            </Card>
-          </CardTab>
-        </TabbedCard>
+            </CardTab>
+          </TabbedCard>
+        </Card>
       ))}
     </>
   );
