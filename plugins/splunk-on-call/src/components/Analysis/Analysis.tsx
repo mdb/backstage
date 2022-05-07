@@ -18,7 +18,13 @@ import React from 'react';
 import useAsync from 'react-use/lib/useAsync';
 import { useApi } from '@backstage/core-plugin-api';
 import { Alert } from '@material-ui/lab';
-import { Gauge, Progress, TrendLine } from '@backstage/core-components';
+import { useTheme } from '@material-ui/core';
+import {
+  InfoCard,
+  Gauge,
+  Progress,
+  TrendLine,
+} from '@backstage/core-components';
 import { splunkOnCallApiRef } from '../../api';
 import { Incident, Team } from '../types';
 
@@ -41,6 +47,7 @@ const groupByDay = (incidents: Incident[]) => {
 };
 
 export const Analysis = ({ team }: { team: Team | undefined }) => {
+  const theme = useTheme();
   const api = useApi(splunkOnCallApiRef);
   const date = new Date();
   date.setDate(date.getDate() - 6);
@@ -121,30 +128,42 @@ export const Analysis = ({ team }: { team: Team | undefined }) => {
       return trend / orgCeiling;
     });
 
-    const headingPrefix = team ? team.name : 'Your organization';
+    const gaugeSubheader = `Since ${date.toUTCString()}, ${
+      teamIncidents.length
+    } of your organization's ${
+      value.length
+    } resolved incidents were assigned to and resolved by ${team?.name}.`;
+    const teamTrendSubheader = `${teamIncidents.length} ${
+      team?.name
+    } incidents have been created and resolved since ${date.toUTCString()}.`;
+    const orgTrendSubheader = `${
+      value.length
+    } total incidents have been created and resolved since ${date.toUTCString()} across your organization.`;
+    const color = theme.palette.primary.light;
 
     return (
       <>
-        {headingPrefix} resolved {teamIncidents.length} incidents between{' '}
-        {date.toUTCString()} and now
-        <TrendLine
-          color="blue"
-          data={teamTrends}
-          title="Incidents over the last week"
-        />
-        Your organization resolved {value.length} incidents between{' '}
-        {date.toUTCString()} and now
-        <TrendLine
-          color="blue"
-          data={orgTrends}
-          title="Incidents over the last week"
-        />
-        <Gauge
-          getColor={() => 'blue'}
-          fractional={false}
-          unit=""
-          value={(100 * teamIncidents.length) / value.length}
-        />
+        <InfoCard title="Resolved team incidents" subheader={gaugeSubheader}>
+          <Gauge
+            getColor={() => color}
+            fractional={false}
+            unit=""
+            value={(100 * teamIncidents.length) / value.length}
+          />
+        </InfoCard>
+        <InfoCard title="One week team trend" subheader={teamTrendSubheader}>
+          <TrendLine
+            color={color}
+            data={teamTrends}
+            title={teamTrendSubheader}
+          />
+        </InfoCard>
+        <InfoCard
+          title="One week organization-wide trend"
+          subheader={orgTrendSubheader}
+        >
+          <TrendLine color={color} data={orgTrends} title={orgTrendSubheader} />
+        </InfoCard>
       </>
     );
   }
