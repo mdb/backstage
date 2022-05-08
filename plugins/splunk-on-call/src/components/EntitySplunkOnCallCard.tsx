@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import React, { useCallback, useState } from 'react';
 import useAsync from 'react-use/lib/useAsync';
 import { Entity } from '@backstage/catalog-model';
@@ -29,13 +30,10 @@ import WebIcon from '@material-ui/icons/Web';
 import { Alert } from '@material-ui/lab';
 import { splunkOnCallApiRef, UnauthorizedError } from '../api';
 import { MissingApiKeyOrApiIdError } from './Errors/MissingApiKeyOrApiIdError';
-import { EscalationPolicy } from './Escalation';
-import { Incidents } from './Incident';
-import { Analysis } from './Analysis';
 import { TriggerDialog } from './TriggerDialog';
-import { Team, User } from './types';
+import { Content } from './Content';
+import { User } from './types';
 import { configApiRef, useApi } from '@backstage/core-plugin-api';
-import { CardTab, TabbedCard } from '@backstage/core-components';
 
 import {
   EmptyState,
@@ -123,7 +121,6 @@ export const EntitySplunkOnCallCard = (props: EntitySplunkOnCallCardProps) => {
   const api = useApi(splunkOnCallApiRef);
   const { entity } = useEntity();
   const [showDialog, setShowDialog] = useState<boolean>(false);
-  const [refreshIncidents, setRefreshIncidents] = useState<boolean>(false);
   const teamAnnotation = entity
     ? entity.metadata.annotations![SPLUNK_ON_CALL_TEAM]
     : undefined;
@@ -134,12 +131,14 @@ export const EntitySplunkOnCallCard = (props: EntitySplunkOnCallCardProps) => {
   const eventsRestEndpoint =
     config.getOptionalString('splunkOnCall.eventsRestEndpoint') || null;
 
-  const handleRefresh = useCallback(() => {
-    setRefreshIncidents(x => !x);
-  }, []);
-
   const handleDialog = useCallback(() => {
     setShowDialog(x => !x);
+  }, []);
+
+  const [refreshIncidents, setRefreshIncidents] = useState<boolean>(false);
+
+  const handleRefresh = useCallback(() => {
+    setRefreshIncidents(x => !x);
   }, []);
 
   const {
@@ -215,35 +214,6 @@ export const EntitySplunkOnCallCard = (props: EntitySplunkOnCallCardProps) => {
     );
   }
 
-  const Content = ({
-    team,
-    usersHashMap,
-  }: {
-    team: Team | undefined;
-    usersHashMap: any;
-  }) => {
-    const teamName = team?.name ?? '';
-
-    return (
-      <>
-        <Incidents
-          readOnly={readOnly || false}
-          team={teamName}
-          refreshIncidents={refreshIncidents}
-        />
-        {usersHashMap && team && (
-          <EscalationPolicy team={teamName} users={usersHashMap} />
-        )}
-        <TriggerDialog
-          team={teamName}
-          showDialog={showDialog}
-          handleDialog={handleDialog}
-          onIncidentCreated={handleRefresh}
-        />
-      </>
-    );
-  };
-
   const triggerLink: IconLinkVerticalProps = {
     label: 'Create Incident',
     onClick: handleDialog,
@@ -275,14 +245,18 @@ export const EntitySplunkOnCallCard = (props: EntitySplunkOnCallCardProps) => {
               />,
             ]}
           />
-          <TabbedCard>
-            <CardTab label="Incidents">
-              <Content team={team} usersHashMap={usersAndTeams?.usersHashMap} />
-            </CardTab>
-            <CardTab label="Analysis">
-              <Analysis team={team} />
-            </CardTab>
-          </TabbedCard>
+          <Content
+            team={team}
+            usersHashMap={usersAndTeams?.usersHashMap}
+            readOnly={readOnly}
+            refreshIncidents={refreshIncidents}
+          />
+          <TriggerDialog
+            team={team && team.name ? team.name : ''}
+            showDialog={showDialog}
+            handleDialog={handleDialog}
+            onIncidentCreated={handleRefresh}
+          />
         </Card>
       ))}
     </>
