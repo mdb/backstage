@@ -24,12 +24,14 @@ import {
 } from '@material-ui/core';
 import { IncidentListItem } from './IncidentListItem';
 import { IncidentsEmptyState } from './IncidentEmptyState';
+import { Analysis } from '../Analysis';
+import { Team } from '../types';
 import useAsyncFn from 'react-use/lib/useAsyncFn';
 import { splunkOnCallApiRef } from '../../api';
 import { Alert } from '@material-ui/lab';
 
 import { useApi } from '@backstage/core-plugin-api';
-import { Progress } from '@backstage/core-components';
+import { CardTab, Progress, TabbedCard } from '@backstage/core-components';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -48,12 +50,13 @@ const useStyles = makeStyles((theme: Theme) =>
 
 type Props = {
   refreshIncidents: boolean;
-  team: string;
+  team: Team | undefined;
   readOnly: boolean;
 };
 
 export const Incidents = ({ readOnly, refreshIncidents, team }: Props) => {
   const classes = useStyles();
+  const teamName = team?.name ?? '';
   const api = useApi(splunkOnCallApiRef);
 
   const [{ value: incidents, loading, error }, getIncidents] = useAsyncFn(
@@ -64,7 +67,9 @@ export const Incidents = ({ readOnly, refreshIncidents, team }: Props) => {
       await new Promise(resolve => setTimeout(resolve, 2000));
       const allIncidents = await api.getIncidents();
       const teams = await api.getTeams();
-      const teamSlug = teams.find(teamValue => teamValue.name === team)?.slug;
+      const teamSlug = teams.find(
+        teamValue => teamValue.name === teamName,
+      )?.slug;
       const filteredIncidents = teamSlug
         ? allIncidents.filter(incident =>
             incident.pagedTeams?.includes(teamSlug),
@@ -91,28 +96,35 @@ export const Incidents = ({ readOnly, refreshIncidents, team }: Props) => {
   }
 
   return (
-    <List
-      className={classes.root}
-      dense
-      subheader={
-        <ListSubheader className={classes.subheader}>
-          CRITICAL INCIDENTS
-        </ListSubheader>
-      }
-    >
-      {loading ? (
-        <Progress className={classes.progress} />
-      ) : (
-        incidents!.map((incident, index) => (
-          <IncidentListItem
-            onIncidentAction={() => getIncidents()}
-            key={index}
-            team={team}
-            incident={incident}
-            readOnly={readOnly}
-          />
-        ))
-      )}
-    </List>
+    <TabbedCard>
+      <CardTab label="Incidents">
+        <List
+          className={classes.root}
+          dense
+          subheader={
+            <ListSubheader className={classes.subheader}>
+              CRITICAL INCIDENTS
+            </ListSubheader>
+          }
+        >
+          {loading ? (
+            <Progress className={classes.progress} />
+          ) : (
+            incidents!.map((incident, index) => (
+              <IncidentListItem
+                onIncidentAction={() => getIncidents()}
+                key={index}
+                team={teamName}
+                incident={incident}
+                readOnly={readOnly}
+              />
+            ))
+          )}
+        </List>
+      </CardTab>
+      <CardTab label="Analysis">
+        <Analysis team={team} />
+      </CardTab>
+    </TabbedCard>
   );
 };

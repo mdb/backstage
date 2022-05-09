@@ -44,7 +44,11 @@ describe('Incidents', () => {
     const { getByText, queryByTestId } = render(
       wrapInTestApp(
         <ApiProvider apis={apis}>
-          <Incidents readOnly={false} refreshIncidents={false} team="test" />
+          <Incidents
+            readOnly={false}
+            refreshIncidents={false}
+            team={MOCK_TEAM}
+          />
         </ApiProvider>,
       ),
     );
@@ -68,7 +72,11 @@ describe('Incidents', () => {
     } = render(
       wrapInTestApp(
         <ApiProvider apis={apis}>
-          <Incidents readOnly={false} team="test" refreshIncidents={false} />
+          <Incidents
+            readOnly={false}
+            team={MOCK_TEAM}
+            refreshIncidents={false}
+          />
         </ApiProvider>,
       ),
     );
@@ -97,7 +105,7 @@ describe('Incidents', () => {
     const { getByText, getAllByTitle, getByLabelText, queryByTestId } = render(
       wrapInTestApp(
         <ApiProvider apis={apis}>
-          <Incidents readOnly team="test" refreshIncidents={false} />
+          <Incidents readOnly team={MOCK_TEAM} refreshIncidents={false} />
         </ApiProvider>,
       ),
     );
@@ -133,7 +141,11 @@ describe('Incidents', () => {
     const { getByText, queryByTestId } = render(
       wrapInTestApp(
         <ApiProvider apis={apis}>
-          <Incidents readOnly={false} team="test" refreshIncidents={false} />
+          <Incidents
+            readOnly={false}
+            team={MOCK_TEAM}
+            refreshIncidents={false}
+          />
         </ApiProvider>,
       ),
     );

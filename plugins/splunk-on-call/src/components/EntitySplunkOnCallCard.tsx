@@ -31,11 +31,9 @@ import { splunkOnCallApiRef, UnauthorizedError } from '../api';
 import { MissingApiKeyOrApiIdError } from './Errors/MissingApiKeyOrApiIdError';
 import { EscalationPolicy } from './Escalation';
 import { Incidents } from './Incident';
-import { Analysis } from './Analysis';
 import { TriggerDialog } from './TriggerDialog';
 import { Team, User } from './types';
 import { configApiRef, useApi } from '@backstage/core-plugin-api';
-import { CardTab, TabbedCard } from '@backstage/core-components';
 
 import {
   EmptyState,
@@ -228,7 +226,7 @@ export const EntitySplunkOnCallCard = (props: EntitySplunkOnCallCardProps) => {
       <>
         <Incidents
           readOnly={readOnly || false}
-          team={teamName}
+          team={team}
           refreshIncidents={refreshIncidents}
         />
         {usersHashMap && team && (
@@ -275,14 +273,7 @@ export const EntitySplunkOnCallCard = (props: EntitySplunkOnCallCardProps) => {
               />,
             ]}
           />
-          <TabbedCard>
-            <CardTab label="Incidents">
-              <Content team={team} usersHashMap={usersAndTeams?.usersHashMap} />
-            </CardTab>
-            <CardTab label="Analysis">
-              <Analysis team={team} />
-            </CardTab>
-          </TabbedCard>
+          <Content team={team} usersHashMap={usersAndTeams?.usersHashMap} />
         </Card>
       ))}
     </>
