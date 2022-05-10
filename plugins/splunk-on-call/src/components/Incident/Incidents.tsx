@@ -65,17 +65,21 @@ export const Incidents = ({ readOnly, refreshIncidents, team }: Props) => {
       // may take some time to actually be applied after receiving the response from the server.
       // The timeout compensates for this latency.
       await new Promise(resolve => setTimeout(resolve, 2000));
-      const allIncidents = await api.getIncidents();
+      const totalIncidents = await api.getIncidents();
       const teams = await api.getTeams();
       const teamSlug = teams.find(
         teamValue => teamValue.name === teamName,
       )?.slug;
-      const filteredIncidents = teamSlug
-        ? allIncidents.filter(incident =>
+      const teamIncidents = teamSlug
+        ? totalIncidents.filter(incident =>
             incident.pagedTeams?.includes(teamSlug),
           )
         : [];
-      return filteredIncidents;
+
+      return {
+        teamIncidents,
+        totalIncidents,
+      };
     },
   );
 
@@ -91,7 +95,7 @@ export const Incidents = ({ readOnly, refreshIncidents, team }: Props) => {
     );
   }
 
-  if (!loading && !incidents?.length) {
+  if (!loading && !incidents?.teamIncidents.length) {
     return <IncidentsEmptyState />;
   }
 
@@ -110,7 +114,7 @@ export const Incidents = ({ readOnly, refreshIncidents, team }: Props) => {
           {loading ? (
             <Progress className={classes.progress} />
           ) : (
-            incidents!.map((incident, index) => (
+            incidents?.teamIncidents!.map((incident, index) => (
               <IncidentListItem
                 onIncidentAction={() => getIncidents()}
                 key={index}
@@ -123,7 +127,15 @@ export const Incidents = ({ readOnly, refreshIncidents, team }: Props) => {
         </List>
       </CardTab>
       <CardTab label="Analysis">
-        <Analysis team={team} />
+        {loading ? (
+          <Progress className={classes.progress} />
+        ) : (
+          <Analysis
+            team={team}
+            totalIncidents={incidents?.totalIncidents || []}
+            teamIncidents={incidents?.teamIncidents || []}
+          />
+        )}
       </CardTab>
     </TabbedCard>
   );

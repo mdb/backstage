@@ -46,7 +46,15 @@ const groupByDay = (incidents: Incident[]) => {
   return groupings;
 };
 
-export const Analysis = ({ team }: { team: Team | undefined }) => {
+export const Analysis = ({
+  team,
+  teamIncidents,
+  totalIncidents,
+}: {
+  team: Team | undefined;
+  teamIncidents: Incident[];
+  totalIncidents: Incident[];
+}) => {
   const theme = useTheme();
   const api = useApi(splunkOnCallApiRef);
   const date = new Date();
@@ -101,7 +109,7 @@ export const Analysis = ({ team }: { team: Team | undefined }) => {
   }
 
   if (value) {
-    const teamIncidents = team
+    const resolvedTeamIncidents = team
       ? value.filter(incident => {
           if (!team?.slug) {
             return false;
@@ -110,7 +118,7 @@ export const Analysis = ({ team }: { team: Team | undefined }) => {
           return incident?.pagedTeams?.includes(team?.slug);
         })
       : value;
-    const teamGroupings = groupByDay(teamIncidents);
+    const teamGroupings = groupByDay(resolvedTeamIncidents);
     const teamRawTrends = Object.keys(teamGroupings).map(key => {
       return teamGroupings[key].length;
     });
@@ -128,12 +136,8 @@ export const Analysis = ({ team }: { team: Team | undefined }) => {
       return trend / orgCeiling;
     });
 
-    const gaugeSubheader = `Since ${date.toUTCString()}, ${
-      teamIncidents.length
-    } of your organization's ${
-      value.length
-    } resolved incidents were assigned to and resolved by ${team?.name}.`;
-    const teamTrendSubheader = `${teamIncidents.length} ${
+    const resolvedSubheader = `${team?.name} assigned and resolved ${resolvedTeamIncidents.length}/${value.length} of your organization's incidents.`;
+    const teamTrendSubheader = `${resolvedTeamIncidents.length} ${
       team?.name
     } incidents have been created and resolved since ${date.toUTCString()}.`;
     const orgTrendSubheader = `${
@@ -141,14 +145,29 @@ export const Analysis = ({ team }: { team: Team | undefined }) => {
     } total incidents have been created and resolved since ${date.toUTCString()} across your organization.`;
     const color = theme.palette.primary.light;
 
+    const openTeamIncidents = teamIncidents?.filter(
+      incident => incident.currentPhase !== 'RESOLVED',
+    );
+    const openOrgIncidents = totalIncidents?.filter(
+      incident => incident.currentPhase !== 'RESOLVED',
+    );
+    const unresolvedSubheader = `${openTeamIncidents.length}/${openOrgIncidents?.length} unresolved incidents are assigned to ${team?.name}.`;
+
     return (
       <>
-        <InfoCard title="Resolved team incidents" subheader={gaugeSubheader}>
+        <InfoCard title="Unresolved incidents" subheader={unresolvedSubheader}>
           <Gauge
             getColor={() => color}
-            fractional={false}
-            unit=""
-            value={(100 * teamIncidents.length) / value.length}
+            value={openTeamIncidents?.length / openOrgIncidents?.length}
+          />
+        </InfoCard>
+        <InfoCard
+          title={`Incidents resolved since ${date.toUTCString()}`}
+          subheader={resolvedSubheader}
+        >
+          <Gauge
+            getColor={() => color}
+            value={teamIncidents?.length / value.length}
           />
         </InfoCard>
         <InfoCard title="One week team trend" subheader={teamTrendSubheader}>
@@ -158,10 +177,7 @@ export const Analysis = ({ team }: { team: Team | undefined }) => {
             title={teamTrendSubheader}
           />
         </InfoCard>
-        <InfoCard
-          title="One week organization-wide trend"
-          subheader={orgTrendSubheader}
-        >
+        <InfoCard title="One week org trend" subheader={orgTrendSubheader}>
           <TrendLine color={color} data={orgTrends} title={orgTrendSubheader} />
         </InfoCard>
       </>
