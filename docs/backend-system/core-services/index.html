@@ -78,7 +78,7 @@ This single route will be available at the <code>/api/example/hello</code> path.
 <span class="hljs-keyword">import</span> { Router } <span class="hljs-keyword">from</span> <span class="hljs-string">'express'</span>;
 
 createBackendPlugin({
-  id: <span class="hljs-string">'example'</span>,
+  pluginId: <span class="hljs-string">'example'</span>,
   register(env) {
     env.registerInit({
       deps: { http: coreServices.httpRouter },
@@ -121,7 +121,7 @@ createBackendPlugin({
 <span class="hljs-keyword">import</span> { Router } <span class="hljs-keyword">from</span> <span class="hljs-string">'express'</span>;
 
 createBackendPlugin({
-  id: <span class="hljs-string">'example'</span>,
+  pluginId: <span class="hljs-string">'example'</span>,
   register(env) {
     env.registerInit({
       deps: {
@@ -181,7 +181,7 @@ createBackendPlugin({
 } <span class="hljs-keyword">from</span> <span class="hljs-string">'@backstage/backend-plugin-api'</span>;
 
 createBackendPlugin({
-  id: <span class="hljs-string">'example'</span>,
+  pluginId: <span class="hljs-string">'example'</span>,
   register(env) {
     env.registerInit({
       deps: {
@@ -229,7 +229,7 @@ createBackendPlugin({
 } <span class="hljs-keyword">from</span> <span class="hljs-string">'@backstage/backend-plugin-api'</span>;
 
 createBackendPlugin({
-  id: <span class="hljs-string">'example'</span>,
+  pluginId: <span class="hljs-string">'example'</span>,
   register(env) {
     env.registerInit({
       deps: {
@@ -289,7 +289,7 @@ createBackendPlugin({
 } <span class="hljs-keyword">from</span> <span class="hljs-string">'@backstage/backend-plugin-api'</span>;
 
 createBackendPlugin({
-  id: <span class="hljs-string">'example'</span>,
+  pluginId: <span class="hljs-string">'example'</span>,
   register(env) {
     env.registerInit({
       deps: {
@@ -320,7 +320,7 @@ createBackendPlugin({
 <span class="hljs-keyword">import</span> { resolvePackagePath } <span class="hljs-keyword">from</span> <span class="hljs-string">'@backstage/backend-common'</span>;
 
 createBackendPlugin({
-  id: <span class="hljs-string">'example'</span>,
+  pluginId: <span class="hljs-string">'example'</span>,
   register(env) {
     env.registerInit({
       deps: {
@@ -353,7 +353,7 @@ createBackendPlugin({
 <span class="hljs-keyword">import</span> { fetch } <span class="hljs-keyword">from</span> <span class="hljs-string">'node-fetch'</span>;
 
 createBackendPlugin({
-  id: <span class="hljs-string">'example'</span>,
+  pluginId: <span class="hljs-string">'example'</span>,
   register(env) {
     env.registerInit({
       deps: {
@@ -378,7 +378,7 @@ createBackendPlugin({
 <span class="hljs-keyword">import</span> { Router } <span class="hljs-keyword">from</span> <span class="hljs-string">'express'</span>;
 
 createBackendPlugin({
-  id: <span class="hljs-string">'example'</span>,
+  pluginId: <span class="hljs-string">'example'</span>,
   register(env) {
     env.registerInit({
       deps: {
@@ -436,7 +436,7 @@ createBackendPlugin({
 } <span class="hljs-keyword">from</span> <span class="hljs-string">'@backstage/backend-plugin-api'</span>;
 
 createBackendPlugin({
-  id: <span class="hljs-string">'example'</span>,
+  pluginId: <span class="hljs-string">'example'</span>,
   register(env) {
     env.registerInit({
       deps: {
@@ -450,10 +450,7 @@ createBackendPlugin({
           <span class="hljs-comment">// do some other stuff.</span>
         }, <span class="hljs-number">1000</span>);
 
-        lifecycle.addShutdownHook({
-          fn: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> clearInterval(interval),
-          logger,
-        });
+        lifecycle.addShutdownHook(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> clearInterval(interval));
       },
     });
   },
@@ -464,17 +461,19 @@ createBackendPlugin({
 <h3><a class="anchor" aria-hidden="true" id="configure-the-service"></a><a href="#configure-the-service" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Configure the service</h3>
 <p>The following example shows how to override the default implementation of the lifecycle service with something that listens on different process events to the original.</p>
 <pre><code class="hljs css language-ts"><span class="hljs-keyword">class</span> MyCustomLifecycleService <span class="hljs-keyword">implements</span> RootLifecycleService {
-  <span class="hljs-keyword">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span> readonly logger: LoggerService</span>) {
-    [<span class="hljs-string">'SIGKILL'</span>, <span class="hljs-string">'SIGTERM'</span>].map(<span class="hljs-function"><span class="hljs-params">signal</span> =&gt;</span>
-      process.on(signal, <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.shutdown()),
-    );
-  }
+  <span class="hljs-keyword">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span> readonly logger: LoggerService</span>) {}
 
   #isCalled = <span class="hljs-literal">false</span>;
-  #shutdownTasks: <span class="hljs-built_in">Array</span>&lt;LifecycleServiceShutdownHook&gt; = [];
+  #shutdownTasks: <span class="hljs-built_in">Array</span>&lt;{
+    hook: LifecycleServiceShutdownHook;
+    options?: LifecycleServiceShutdownOptions;
+  }&gt; = [];
 
-  addShutdownHook(options: LifecycleServiceShutdownHook): <span class="hljs-built_in">void</span> {
-    <span class="hljs-keyword">this</span>.#shutdownTasks.push(options);
+  addShutdownHook(
+    hook: LifecycleServiceShutdownHook,
+    options?: LifecycleServiceShutdownOptions,
+  ): <span class="hljs-built_in">void</span> {
+    <span class="hljs-keyword">this</span>.#shutdownTasks.push({ hook, options });
   }
 
   <span class="hljs-keyword">async</span> shutdown(): <span class="hljs-built_in">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt; {
@@ -485,10 +484,10 @@ createBackendPlugin({
 
     <span class="hljs-keyword">this</span>.logger.info(<span class="hljs-string">`Running <span class="hljs-subst">${<span class="hljs-keyword">this</span>.#shutdownTasks.length}</span> shutdown tasks...`</span>);
     <span class="hljs-keyword">await</span> <span class="hljs-built_in">Promise</span>.all(
-      <span class="hljs-keyword">this</span>.#shutdownTasks.map(<span class="hljs-keyword">async</span> hook =&gt; {
-        <span class="hljs-keyword">const</span> { logger = <span class="hljs-keyword">this</span>.logger } = hook;
+      <span class="hljs-keyword">this</span>.#shutdownTasks.map(<span class="hljs-keyword">async</span> ({ hook, options }) =&gt; {
+        <span class="hljs-keyword">const</span> logger = options?.logger ?? <span class="hljs-keyword">this</span>.logger;
         <span class="hljs-keyword">try</span> {
-          <span class="hljs-keyword">await</span> hook.fn();
+          <span class="hljs-keyword">await</span> hook();
           logger.info(<span class="hljs-string">`Shutdown hook succeeded`</span>);
         } <span class="hljs-keyword">catch</span> (error) {
           logger.error(<span class="hljs-string">`Shutdown hook failed, <span class="hljs-subst">${error}</span>`</span>);
@@ -523,7 +522,7 @@ createBackendPlugin({
 <span class="hljs-keyword">import</span> { Router } <span class="hljs-keyword">from</span> <span class="hljs-string">'express'</span>;
 
 createBackendPlugin({
-  id: <span class="hljs-string">'example'</span>,
+  pluginId: <span class="hljs-string">'example'</span>,
   register(env) {
     env.registerInit({
       deps: {
@@ -566,7 +565,7 @@ createBackendPlugin({
 <span class="hljs-keyword">import</span> { fetch } <span class="hljs-keyword">from</span> <span class="hljs-string">'node-fetch'</span>;
 
 createBackendPlugin({
-  id: <span class="hljs-string">'example'</span>,
+  pluginId: <span class="hljs-string">'example'</span>,
   register(env) {
     env.registerInit({
       deps: {
@@ -598,7 +597,7 @@ createBackendPlugin({
 <span class="hljs-keyword">import</span> os <span class="hljs-keyword">from</span> <span class="hljs-string">'os'</span>;
 
 createBackendPlugin({
-  id: <span class="hljs-string">'example'</span>,
+  pluginId: <span class="hljs-string">'example'</span>,
   register(env) {
     env.registerInit({
       deps: {
@@ -620,7 +619,7 @@ createBackendPlugin({
   },
 });
 </code></pre>
-</span></div></article></div><div class="docLastUpdate"><em>Last updated on 2/3/2023</em></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/backend-system/building-plugins-and-modules/migrating"><span class="arrow-prev">← </span><span>Migration Guide</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#http-router-service">HTTP Router Service</a><ul class="toc-headings"><li><a href="#using-the-service">Using the service</a></li><li><a href="#configuring-the-service">Configuring the service</a></li></ul></li><li><a href="#root-http-router">Root HTTP Router</a><ul class="toc-headings"><li><a href="#using-the-service-1">Using the service</a></li><li><a href="#configuring-the-service-1">Configuring the service</a></li></ul></li><li><a href="#config">Config</a><ul class="toc-headings"><li><a href="#using-the-service-2">Using the service</a></li><li><a href="#configuring-the-service-2">Configuring the service</a></li></ul></li><li><a href="#logging">Logging</a><ul class="toc-headings"><li><a href="#using-the-service-3">Using the service</a></li><li><a href="#root-logger">Root Logger</a></li><li><a href="#configuring-the-service-3">Configuring the service</a></li></ul></li><li><a href="#cache">Cache</a><ul class="toc-headings"><li><a href="#using-the-service-4">Using the service</a></li></ul></li><li><a href="#database">Database</a><ul class="toc-headings"><li><a href="#using-the-service-5">Using the service</a></li></ul></li><li><a href="#discovery">Discovery</a><ul class="toc-headings"><li><a href="#using-the-service-6">Using the service</a></li></ul></li><li><a href="#identity">Identity</a><ul class="toc-headings"><li><a href="#using-the-service-7">Using the service</a></li><li><a href="#configuring-the-service-4">Configuring the service</a></li></ul></li><li><a href="#lifecycle">Lifecycle</a><ul class="toc-headings"><li><a href="#using-the-service-8">Using the service</a></li></ul></li><li><a href="#root-lifecycle">Root Lifecycle</a><ul class="toc-headings"><li><a href="#configure-the-service">Configure the service</a></li></ul></li><li><a href="#permissions">Permissions</a><ul class="toc-headings"><li><a href="#using-the-service-9">Using the service</a></li></ul></li><li><a href="#scheduler">Scheduler</a><ul class="toc-headings"><li><a href="#using-the-service-10">Using the service</a></li></ul></li><li><a href="#url-readers">URL Readers</a><ul class="toc-headings"><li><a href="#using-the-service-11">Using the service</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><div class="footer-title"><a href="/"><h2 class="footerLogo"></h2></a></div><div><h5>Docs</h5><a href="/docs/overview/what-is-backstage">What is Backstage?</a><a href="/docs/getting-started/">Getting started</a><a href="/docs/features/software-catalog/software-catalog-overview">Software Catalog</a><a href="/docs/plugins/create-a-plugin">Create a Plugin</a><a href="/docs/dls/design">Designing for Backstage</a></div><div><h5>Community</h5><a href="https://discord.gg/MUpMjP2">Support chatroom</a><a href="https://github.com/backstage/backstage/blob/master/CONTRIBUTING.md">Contributing</a><a href="https://backstage.spotify.com">Adopting</a><a href="https://github.com/backstage/community">Community Sessions</a><a href="https://info.backstage.spotify.com/newsletter_subscribe">Subscribe to our newsletter</a><a href="https://www.cncf.io/projects/">CNCF Incubation</a></div><div><h5>More</h5><a href="https://spotify.github.io/">Open Source @ Spotify</a><a href="https://engineering.atspotify.com/">Spotify Engineering Blog</a><a href="https://developer.spotify.com/">Spotify for Developers</a><a href="https://github.com/backstage/backstage">GitHub</a><a class="github-button" href="https://github.com/backstage/backstage" data-icon="octicon-star" data-count-href="/backstage/backstage/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a><div class="social"><a href="https://twitter.com/SpotifyEng" class="twitter-follow-button">Follow @SpotifyEng</a></div></div></section><p style="text-align:center"><a href="https://spotify.github.io">Made with ❤️ at Spotify</a></p><p class="copyright">Copyright © 2023 Backstage Project Authors. All rights reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our Trademark Usage page: https://www.linuxfoundation.org/trademark-usage</p></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>window.twttr=(function(d,s, id){var js,fjs=d.getElementsByTagName(s)[0],t=window.twttr||{};if(d.getElementById(id))return t;js=d.createElement(s);js.id=id;js.src='https://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js, fjs);t._e = [];t.ready = function(f) {t._e.push(f);};return t;}(document, 'script', 'twitter-wjs'));</script><script>
+</span></div></article></div><div class="docLastUpdate"><em>Last updated on 2/7/2023</em></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/backend-system/building-plugins-and-modules/migrating"><span class="arrow-prev">← </span><span>Migration Guide</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#http-router-service">HTTP Router Service</a><ul class="toc-headings"><li><a href="#using-the-service">Using the service</a></li><li><a href="#configuring-the-service">Configuring the service</a></li></ul></li><li><a href="#root-http-router">Root HTTP Router</a><ul class="toc-headings"><li><a href="#using-the-service-1">Using the service</a></li><li><a href="#configuring-the-service-1">Configuring the service</a></li></ul></li><li><a href="#config">Config</a><ul class="toc-headings"><li><a href="#using-the-service-2">Using the service</a></li><li><a href="#configuring-the-service-2">Configuring the service</a></li></ul></li><li><a href="#logging">Logging</a><ul class="toc-headings"><li><a href="#using-the-service-3">Using the service</a></li><li><a href="#root-logger">Root Logger</a></li><li><a href="#configuring-the-service-3">Configuring the service</a></li></ul></li><li><a href="#cache">Cache</a><ul class="toc-headings"><li><a href="#using-the-service-4">Using the service</a></li></ul></li><li><a href="#database">Database</a><ul class="toc-headings"><li><a href="#using-the-service-5">Using the service</a></li></ul></li><li><a href="#discovery">Discovery</a><ul class="toc-headings"><li><a href="#using-the-service-6">Using the service</a></li></ul></li><li><a href="#identity">Identity</a><ul class="toc-headings"><li><a href="#using-the-service-7">Using the service</a></li><li><a href="#configuring-the-service-4">Configuring the service</a></li></ul></li><li><a href="#lifecycle">Lifecycle</a><ul class="toc-headings"><li><a href="#using-the-service-8">Using the service</a></li></ul></li><li><a href="#root-lifecycle">Root Lifecycle</a><ul class="toc-headings"><li><a href="#configure-the-service">Configure the service</a></li></ul></li><li><a href="#permissions">Permissions</a><ul class="toc-headings"><li><a href="#using-the-service-9">Using the service</a></li></ul></li><li><a href="#scheduler">Scheduler</a><ul class="toc-headings"><li><a href="#using-the-service-10">Using the service</a></li></ul></li><li><a href="#url-readers">URL Readers</a><ul class="toc-headings"><li><a href="#using-the-service-11">Using the service</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><div class="footer-title"><a href="/"><h2 class="footerLogo"></h2></a></div><div><h5>Docs</h5><a href="/docs/overview/what-is-backstage">What is Backstage?</a><a href="/docs/getting-started/">Getting started</a><a href="/docs/features/software-catalog/software-catalog-overview">Software Catalog</a><a href="/docs/plugins/create-a-plugin">Create a Plugin</a><a href="/docs/dls/design">Designing for Backstage</a></div><div><h5>Community</h5><a href="https://discord.gg/MUpMjP2">Support chatroom</a><a href="https://github.com/backstage/backstage/blob/master/CONTRIBUTING.md">Contributing</a><a href="https://backstage.spotify.com">Adopting</a><a href="https://github.com/backstage/community">Community Sessions</a><a href="https://info.backstage.spotify.com/newsletter_subscribe">Subscribe to our newsletter</a><a href="https://www.cncf.io/projects/">CNCF Incubation</a></div><div><h5>More</h5><a href="https://spotify.github.io/">Open Source @ Spotify</a><a href="https://engineering.atspotify.com/">Spotify Engineering Blog</a><a href="https://developer.spotify.com/">Spotify for Developers</a><a href="https://github.com/backstage/backstage">GitHub</a><a class="github-button" href="https://github.com/backstage/backstage" data-icon="octicon-star" data-count-href="/backstage/backstage/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a><div class="social"><a href="https://twitter.com/SpotifyEng" class="twitter-follow-button">Follow @SpotifyEng</a></div></div></section><p style="text-align:center"><a href="https://spotify.github.io">Made with ❤️ at Spotify</a></p><p class="copyright">Copyright © 2023 Backstage Project Authors. All rights reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our Trademark Usage page: https://www.linuxfoundation.org/trademark-usage</p></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>window.twttr=(function(d,s, id){var js,fjs=d.getElementsByTagName(s)[0],t=window.twttr||{};if(d.getElementById(id))return t;js=d.createElement(s);js.id=id;js.src='https://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js, fjs);t._e = [];t.ready = function(f) {t._e.push(f);};return t;}(document, 'script', 'twitter-wjs'));</script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;
